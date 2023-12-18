@@ -3,6 +3,7 @@ package render
 import (
 	"bytes"
 	"golangWebApp/pkg/config"
+	"golangWebApp/pkg/models"
 	"log"
 	"net/http"
 	"text/template"
@@ -25,7 +26,12 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+
+	return td
+}
+
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	var TemplateCache map[string]*template.Template
 	var err error = nil
 	if app.UseCache {
@@ -45,7 +51,9 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 	}
 
 	buf := new(bytes.Buffer)
-	err = t.Execute(buf, nil)
+	td = AddDefaultData(td)
+
+	err = t.Execute(buf, td)
 	if err != nil {
 		log.Println(err)
 	}
